@@ -1,0 +1,28 @@
+{
+  "name": "nw-screenshare",
+  "version": "1.0.0",
+  "description": "nw screenshare start",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ymyang/nw-screenshare.git"
+  },
+  "keywords": [
+    "mw",
+    "screenshare"
+  ],
+  "author": "ymyang",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ymyang/nw-screenshare/issues"
+  },
+  "homepage": "https://github.com/ymyang/nw-screenshare#readme",
+  "devDependencies": {
+    "fs-jetpack": "^0.9.2",
+    "gulp": "^3.9.1",
+    "shelljs": "^0.7.3"
+  }
+}
