@@ -6,14 +6,12 @@ const app = express();
 
 app.use(express.static('./public'));
 
-//app.get('/', function (req, res) {
-//    res.send('Hello World!');
-//});
-
 const port = 80;
 app.listen(port, () => {
-    console.log('Example app listening on port', port);
+    console.log('express app listening on port', port);
 });
+
+require('./socket.js');
 
 const win = nw.Window.get();
 
@@ -39,7 +37,7 @@ function _select() {
         (streamId) => {
             console.log('streamId:', streamId);
 
-            var vid_constraint = {
+            const vid_constraint = {
                 mandatory: {
                     chromeMediaSource: 'desktop',
                     chromeMediaSourceId: streamId,
@@ -52,9 +50,15 @@ function _select() {
                 audio: false,
                 video: vid_constraint
             }, (stream) => {
-                console.log('stream');
-                document.getElementById('video_1').src = URL.createObjectURL(stream);
-                stream.onended = function() { console.log("Ended"); };
+                console.log('stream:', stream);
+
+                var streamUrl = URL.createObjectURL(stream);
+                console.log('streamUrl:', streamUrl);
+                document.getElementById('video_1').src = streamUrl;
+
+                stream.onended = () => {
+                    console.log("Ended");
+                };
             }, (err) => {
                 console.error('err:', err);
             });
