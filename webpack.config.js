@@ -29,6 +29,6 @@ module.exports = {
             inject: 'body',
             chunks: ['app']
         }),
-        new webpack.optimize.UglifyJsPlugin()
+        //new webpack.optimize.UglifyJsPlugin()
     ]
 };
