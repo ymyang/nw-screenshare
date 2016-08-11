@@ -35,7 +35,7 @@ nw.Screen.Init(); // you only need to call this once
 
 const io = require('socket.io-client');
 
-const RTCPeerConnection = webkitRTCPeerConnection || RTCPeerConnection;
+const RTCPeerConnection = window.RTCPeerConnection || window.webkitRTCPeerConnection;
 
 const url = 'http://127.0.0.1:3001';
 
@@ -132,12 +132,12 @@ function _createPeerConnection() {
         }
     };
 
-    //pc.onaddstream = function(obj) {
-    //    console.log('onaddstream:', obj);
-    //    var sourceUrl = URL.createObjectURL(obj.stream);
-    //    console.log('sourceUrl:', sourceUrl);
-    //    document.getElementById('video_1').src = sourceUrl;
-    //};
+    pc.onaddstream = function(obj) {
+        console.log('onaddstream:', obj);
+        var sourceUrl = URL.createObjectURL(obj.stream);
+        console.log('sourceUrl:', sourceUrl);
+        //document.getElementById('video_1').src = sourceUrl;
+    };
 }
 
 function _select() {
@@ -166,6 +166,8 @@ function _select() {
 
                 console.log('Sending offer...');
 
+                pc.addStream(source);
+
                 pc.createOffer(function(sessionDescription) {
                     console.log('sessionDescription', sessionDescription);
 
@@ -189,8 +191,6 @@ function _select() {
                         OfferToReceiveVideo: true
                     }
                 });
-
-                pc.addStream(source);
 
                 var sourceUrl = URL.createObjectURL(source);
                 console.log('sourceUrl:', sourceUrl);

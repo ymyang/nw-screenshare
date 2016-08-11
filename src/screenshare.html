@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        button {
+            margin-left: 10px;
+        }
+        video {
+            width: 45%;
+        }
+
+        video #local_video {
+            margin-right: 10px;
+        }
+    </style>
+    <script src="screenshare.js"></script>
+</head>
+<body>
+    <p>
+        <button id="btn_start">Start</button>
+        <button id="btn_share">Share</button>
+        <button id="btn_stop">Stop</button>
+    </p>
+
+    <div>
+        <video id="local_video" autoplay></video>
+        <video id="remote_video" autoplay></video>
+    </div>
+</body>
+</html>
