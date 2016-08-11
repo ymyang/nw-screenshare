@@ -16,13 +16,13 @@ const offer_opts = {
     }
 };
 
-var localStream;
-var pc1;
-var pc2;
+var localStream = null;
+var pc1 = null;
+var pc2 = null;
 
-var btnStart = document.getElementById('btn_start');
-var btnShare = document.getElementById('btn_share');
-var btnStop = document.getElementById('btn_stop');
+var btnStart = null;
+var btnShare = null;
+var btnStop = null;
 
 nw.Screen.Init();
 
@@ -85,26 +85,39 @@ function _share() {
         iceServers: []
     });
 
+    pc2 = new RTCPeerConnection({
+        iceServers: []
+    });
+
+    console.log('[pc1]:', pc1);
+    console.log('[pc2]:', pc2);
+
     pc1.onicecandidate = function(event) {
+        console.log('[pc1] onicecandidate:', event);
         if (event.candidate) {
             var candidate = new RTCIceCandidate(event.candidate);
             pc2.addIceCandidate(candidate);
         }
     };
 
-    pc2 = new RTCPeerConnection({
-        iceServers: []
-    });
-
     pc2.onicecandidate = function(event) {
+        console.log('[pc2] onicecandidate:', event);
         if (event.candidate) {
             var candidate = new RTCIceCandidate(event.candidate);
             pc1.addIceCandidate(candidate);
         }
     };
 
+    pc1.oniceconnectionstatechange = function(event) {
+        console.log('[pc1] oniceconnectionstatechange:', pc1.iceConnectionState);
+    };
+
+    pc2.oniceconnectionstatechange = function(event) {
+        console.log('[pc2] oniceconnectionstatechange:', pc2.iceConnectionState);
+    };
 
     pc2.onaddstream = function(event) {
+        console.log('[pc2] onaddstream:', event);
         var sourceUrl = URL.createObjectURL(event.stream);
         console.log('remote sourceUrl:', sourceUrl);
 
@@ -112,18 +125,18 @@ function _share() {
     };
 
     pc1.addStream(localStream);
-
+    console.log('[pc1] addStream:', localStream);
 
     pc1.createOffer(function(desc1) {
 
-        console.log('Create Offer success');
+        console.log('[pc1] Create Offer success');
 
         pc1.setLocalDescription(desc1);
         pc2.setRemoteDescription(desc1);
 
         pc2.createAnswer(function(desc2) {
 
-            console.log('Create Answer success');
+            console.log('[pc2] Create Answer success');
 
             pc2.setLocalDescription(desc2);
             pc1.setRemoteDescription(desc2);
@@ -145,17 +158,4 @@ function _stop() {
 
     btnShare.disabled = false;
     btnStop.disabled = true;
-}
-
-function useH264Codec(sdp) {
-    var updated_sdp = null;
-    var isFirefox = typeof InstallTrigger !== 'undefined';
-
-    if (isFirefox) {
-        updated_sdp = sdp.replace("m=video 9 UDP/TLS/RTP/SAVPF 120 126 97\r\n","m=video 9 UDP/TLS/RTP/SAVPF 126 120 97\r\n");
-    } else {
-        updated_sdp = sdp.replace("m=video 9 UDP/TLS/RTP/SAVPF 100 101 107 116 117 96 97 99 98\r\n","m=video 9 UDP/TLS/RTP/SAVPF 107 101 100 116 117 96 97 99 98\r\n");
-    }
-
-    return updated_sdp;
 }

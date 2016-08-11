@@ -1,7 +1,7 @@
 {
   "name": "nw-screenshare",
   "version": "0.0.1",
-  "main": "screenshare.html",
+  "main": "main.html",
   "window": {
     "title": "nw-screenshare",
     "position": "center",

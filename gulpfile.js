@@ -35,7 +35,7 @@ gulp.task('webpack', () => {
 gulp.task('build', ['webpack'], () => {
     jetpack.copy('./src', './build', {
         overwrite: true,
-        matching: ['package.json', 'main.html', 'main.js', 'socket.js', 'node_modules/**']
+        matching: ['package.json', 'main.html', 'main.js', 'socket-server.js', 'node_modules/**']
     });
 });
 
