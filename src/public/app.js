@@ -1,27 +1,33 @@
 /**
  * Created by yang on 2016/8/8.
  */
+'use strict'
+
 const TAG = '[app]-';
 const io = require('socket.io-client');
+const uuid = require('node-uuid');
 
 const RTCPeerConnection = window.RTCPeerConnection || window.webkitRTCPeerConnection;
 const RTCSessionDescription = window.RTCSessionDescription || window.webkitRTCSessionDescription;
 const RTCIceCandidate = window.RTCIceCandidate || window.webkitRTCIceCandidate;
 
-const url = location.host + ':3001';
+const clientId = uuid.v4();
 
-console.log(TAG, 'socket url:', url);
+const socketUrl = location.host + ':3001' + '?ci=' + clientId;
 
-const socket = io(url);
+console.log(TAG, 'socket url:', socketUrl);
+
+const socket = io(socketUrl);
 
 socket.on('connect', function () {
-    console.log(TAG, 'socket connect:', url);
+    console.log(TAG, 'socket connect:', socketUrl);
 });
 socket.on('error', function (err) {
     console.log(TAG, 'socket error:', err);
 });
 
 let pc = null;
+let remoteClientId = null;
 
 socket.on('message', function (msg) {
     console.log(TAG, 'socket message:', msg);
@@ -29,6 +35,8 @@ socket.on('message', function (msg) {
     if (msg.type === 'offer') {
         //
         console.log(TAG, 'Received offer:', msg.peerDescription);
+
+        remoteClientId = msg.clientId;
 
         _createPeerConnection();
 
@@ -41,6 +49,8 @@ socket.on('message', function (msg) {
 
                 socket.emit('message', {
                     type: 'answer',
+                    clientId: clientId,
+                    toClientId: remoteClientId,
                     peerDescription: sessionDescription
                 });
 
@@ -76,6 +86,8 @@ function _createPeerConnection() {
         if (event.candidate) {
             socket.emit('message', {
                 type: 'candidate',
+                clientId: clientId,
+                toClientId: remoteClientId,
                 candidate: event.candidate
             });
         }

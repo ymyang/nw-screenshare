@@ -1,8 +1,12 @@
 /**
  * Created by yang on 2016/8/8.
  */
+'use strict'
+
 const TAG = '[main]-';
 const express = require('express');
+const uuid = require('node-uuid');
+
 const app = express();
 
 app.use(express.static('./public'));
@@ -27,7 +31,11 @@ const offer_opts = {
     }
 };
 
+const clientId = uuid.v4();
+
 let localStream = null;
+const pcons = {};
+
 let pc = null;
 
 let btnStart = null;
@@ -35,6 +43,8 @@ let btnShare = null;
 let btnStop = null;
 
 let socket = null;
+
+let share = false;
 
 nw.Screen.Init();
 
@@ -59,14 +69,14 @@ win.on('loaded', function() {
 
 function _socket() {
     const io = require('socket.io-client');
-    const url = 'http://127.0.0.1:3001';
-    console.log(TAG, 'socket url:', url);
 
-    socket = io(url);
+    const socketUrl = 'http://127.0.0.1:3001' + '?ci=' + clientId;
+    console.log(TAG, 'socket url:', socketUrl);
 
+    socket = io(socketUrl);
 
     socket.on('connect', function () {
-        console.log(TAG, 'connect:', url);
+        console.log(TAG, 'connect:', socketUrl);
     });
     socket.on('error', function (err) {
         console.log(TAG, 'error:', err);
@@ -82,14 +92,40 @@ function _socket() {
         } else if (msg.type === 'answer') {
 
             console.log(TAG, 'Received answer:', msg.peerDescription);
-            const remoteDescription = msg.peerDescription;
-            pc.setRemoteDescription(new RTCSessionDescription(remoteDescription));
+            let pc = pcons[msg.clientId];
+            if (pc) {
+                let remoteDescription = msg.peerDescription;
+                pc.setRemoteDescription(new RTCSessionDescription(remoteDescription));
+            }
 
         } else if (msg.type === 'candidate') {
 
             //console.log(TAG, 'Received ICE candidate:', JSON.stringify(msg.candidate));
-            const candidate = new RTCIceCandidate(msg.candidate);
-            pc.addIceCandidate(candidate);
+            let pc = pcons[msg.clientId];
+            if (pc) {
+                let candidate = new RTCIceCandidate(msg.candidate);
+                pc.addIceCandidate(candidate);
+            }
+
+        } else if (msg.type === 'join') {
+
+            console.log(TAG, 'join clientId:', msg.clientId);
+
+            pcons[msg.clientId] = null;
+            if (share) {
+                //
+                _createPeerConnection(msg.clientId);
+            }
+
+        } else if (msg.type === 'leave') {
+
+            console.log(TAG, 'leave clientId:', msg.clientId);
+
+            let pc = pcons[msg.clientId];
+            pc && pc.close();
+            pcons[msg.clientId] = null;
+            delete pcons[msg.clientId]
+
         }
     });
 }
@@ -134,16 +170,29 @@ function _share() {
     btnShare.disabled = true;
     btnStop.disabled = false;
 
-    pc = new RTCPeerConnection({
+    share = true;
+
+    for (let ci in pcons) {
+        _createPeerConnection(ci);
+    }
+
+}
+
+function _createPeerConnection(remoteClientId) {
+    const pc = new RTCPeerConnection({
         iceServers: []
     });
 
-    console.log(TAG, '[pc]:', pc);
+    pcons[remoteClientId] = pc;
+
+    console.log(TAG, '[pc] clientId:', remoteClientId,  pc);
 
     pc.onicecandidate = function(event) {
         if (event.candidate) {
             socket.emit('message', {
                 type: 'candidate',
+                clientId: clientId,
+                toClientId: remoteClientId,
                 candidate: event.candidate
             });
         }
@@ -164,6 +213,8 @@ function _share() {
 
         socket.emit('message', {
             type: 'offer',
+            clientId: clientId,
+            toClientId: remoteClientId,
             peerDescription: desc
         });
 
@@ -173,10 +224,17 @@ function _share() {
 }
 
 function _stop() {
-    pc.close();
-    pc = null;
+    share = false;
 
     btnStart.disabled = false;
     btnShare.disabled = false;
     btnStop.disabled = true;
+
+    for (let ci in pcons) {
+        let pc = pcons[ci];
+        if (pc) {
+            pc.close();
+            pcons[ci] = null;
+        }
+    }
 }

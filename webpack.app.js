@@ -1,6 +1,7 @@
 /**
  * Created by yang on 2016/8/8.
  */
+'use strict'
 
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -48,7 +49,7 @@ function _externals() {
     var manifest = require('./package.json');
     var dependencies = manifest.dependencies;
     var externals = {};
-    for (var p in dependencies) {
+    for (let p in dependencies) {
         externals[p] = 'commonjs ' + p;
     }
     return externals;

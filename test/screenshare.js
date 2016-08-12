@@ -62,8 +62,6 @@ function _start() {
 
                 localStream = stream;
 
-                pc1 && pc1.addStream(localStream);
-
                 var sourceUrl = URL.createObjectURL(stream);
                 console.log('local sourceUrl:', sourceUrl);
 
