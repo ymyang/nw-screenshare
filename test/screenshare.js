@@ -11,7 +11,7 @@ const win = nw.Window.get();
 const offer_opts = {
     optional: [],
     mandatory: {
-        OfferToReceiveAudio: false,
+        OfferToReceiveAudio: true,
         OfferToReceiveVideo: true
     }
 };
@@ -53,7 +53,9 @@ function _start() {
                         chromeMediaSource: 'desktop',
                         chromeMediaSourceId: sourceId,
                         maxWidth: 1920,
-                        maxHeight: 1080
+                        maxHeight: 1080,
+                        minFrameRate: 1,
+                        maxFrameRate: 5
                     },
                     optional: []
                 }
