@@ -1,7 +1,7 @@
 /**
  * Created by yang on 2016/8/8.
  */
-var TAG = '[main]-';
+const TAG = '[main]-';
 const express = require('express');
 const app = express();
 
@@ -27,14 +27,14 @@ const offer_opts = {
     }
 };
 
-var localStream = null;
-var pc = null;
+let localStream = null;
+let pc = null;
 
-var btnStart = null;
-var btnShare = null;
-var btnStop = null;
+let btnStart = null;
+let btnShare = null;
+let btnStop = null;
 
-var socket = null;
+let socket = null;
 
 nw.Screen.Init();
 
@@ -82,13 +82,13 @@ function _socket() {
         } else if (msg.type === 'answer') {
 
             console.log(TAG, 'Received answer:', msg.peerDescription);
-            var remoteDescription = msg.peerDescription;
+            const remoteDescription = msg.peerDescription;
             pc.setRemoteDescription(new RTCSessionDescription(remoteDescription));
 
         } else if (msg.type === 'candidate') {
 
             //console.log(TAG, 'Received ICE candidate:', JSON.stringify(msg.candidate));
-            var candidate = new RTCIceCandidate(msg.candidate);
+            const candidate = new RTCIceCandidate(msg.candidate);
             pc.addIceCandidate(candidate);
         }
     });
@@ -115,7 +115,7 @@ function _start() {
 
                 localStream = stream;
 
-                var sourceUrl = URL.createObjectURL(stream);
+                const sourceUrl = URL.createObjectURL(stream);
                 console.log(TAG, 'local sourceUrl:', sourceUrl);
 
                 document.getElementById('local_video').src = sourceUrl;

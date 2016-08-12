@@ -1,7 +1,7 @@
 /**
  * Created by yang on 2016/8/8.
  */
-var TAG = '[app]-';
+const TAG = '[app]-';
 const io = require('socket.io-client');
 
 const RTCPeerConnection = window.RTCPeerConnection || window.webkitRTCPeerConnection;
@@ -21,7 +21,7 @@ socket.on('error', function (err) {
     console.log(TAG, 'socket error:', err);
 });
 
-var pc = null;
+let pc = null;
 
 socket.on('message', function (msg) {
     console.log(TAG, 'socket message:', msg);
@@ -32,7 +32,7 @@ socket.on('message', function (msg) {
 
         _createPeerConnection();
 
-        var remoteDescription = msg.peerDescription;
+        const remoteDescription = msg.peerDescription;
         pc.setRemoteDescription(new RTCSessionDescription(remoteDescription), function() {
             console.log(TAG, 'Sending answer...');
             pc.createAnswer(function(sessionDescription) {
@@ -59,7 +59,7 @@ socket.on('message', function (msg) {
 
     } else if (msg.type === 'candidate') {
         //
-        var candidate = new RTCIceCandidate(msg.candidate);
+        const candidate = new RTCIceCandidate(msg.candidate);
         console.log(candidate);
         pc.addIceCandidate(candidate);
     }
@@ -87,7 +87,7 @@ function _createPeerConnection() {
 
     pc.onaddstream = function(event) {
         console.log(TAG, 'onaddstream:', event);
-        var sourceUrl = URL.createObjectURL(event.stream);
+        const sourceUrl = URL.createObjectURL(event.stream);
         console.log(TAG, 'sourceUrl:', sourceUrl);
         document.getElementById('remote_video').src = sourceUrl;
     };

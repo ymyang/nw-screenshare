@@ -1,7 +1,7 @@
 /**
  * Created by yang on 2016/8/8.
  */
-var TAG = '[socket-server]-';
+const TAG = '[socket-server]-';
 const app = require('express')();
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
