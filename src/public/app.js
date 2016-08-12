@@ -10,31 +10,31 @@ const RTCIceCandidate = window.RTCIceCandidate || window.webkitRTCIceCandidate;
 
 const url = location.host + ':3001';
 
-console.log('socket url:', url);
+console.log(TAG, 'socket url:', url);
 
 const socket = io(url);
 
 socket.on('connect', function () {
-    console.log(TAG, 'connect:', url);
+    console.log(TAG, 'socket connect:', url);
 });
 socket.on('error', function (err) {
-    console.log(TAG, 'error:', err);
+    console.log(TAG, 'socket error:', err);
 });
 
 var pc = null;
 
 socket.on('message', function (msg) {
-    console.log(TAG, 'message:', msg);
+    console.log(TAG, 'socket message:', msg);
 
     if (msg.type === 'offer') {
         //
-        console.log('Received offer:', msg.peerDescription);
+        console.log(TAG, 'Received offer:', msg.peerDescription);
 
         _createPeerConnection();
 
         var remoteDescription = msg.peerDescription;
         pc.setRemoteDescription(new RTCSessionDescription(remoteDescription), function() {
-            console.log('Sending answer...');
+            console.log(TAG, 'Sending answer...');
             pc.createAnswer(function(sessionDescription) {
 
                 pc.setLocalDescription(sessionDescription);
@@ -45,15 +45,15 @@ socket.on('message', function (msg) {
                 });
 
             }, function() {
-                console.log('Create Offer failed');
+                console.log(TAG, 'Create Offer failed');
             });
         }, function() {
-            console.log('Error setting remote description');
+            console.log(TAG, 'Error setting remote description');
         });
 
     } else if (msg.type === 'answer') {
         //
-        console.log('Received answer:', msg.peerDescription);
+        console.log(TAG, 'Received answer:', msg.peerDescription);
 
         return;
 
@@ -70,7 +70,7 @@ function _createPeerConnection() {
         iceServers: []
     });
 
-    console.log('[pc]:', pc);
+    console.log(TAG, '[pc]:', pc);
 
     pc.onicecandidate = function(event) {
         if (event.candidate) {
@@ -82,13 +82,13 @@ function _createPeerConnection() {
     };
 
     pc.oniceconnectionstatechange = function(event) {
-        console.log('oniceconnectionstatechange:', pc.iceConnectionState);
+        console.log(TAG, 'oniceconnectionstatechange:', pc.iceConnectionState);
     };
 
     pc.onaddstream = function(event) {
-        console.log('onaddstream:', event);
+        console.log(TAG, 'onaddstream:', event);
         var sourceUrl = URL.createObjectURL(event.stream);
-        console.log('sourceUrl:', sourceUrl);
-        document.getElementById('video_1').src = sourceUrl;
+        console.log(TAG, 'sourceUrl:', sourceUrl);
+        document.getElementById('remote_video').src = sourceUrl;
     };
 }

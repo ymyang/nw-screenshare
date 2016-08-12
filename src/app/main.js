@@ -9,7 +9,7 @@ app.use(express.static('./public'));
 
 const port = 80;
 app.listen(port, () => {
-    console.log('express app listening on port', port);
+    console.log(TAG, 'express app listening on port', port);
 });
 
 const RTCPeerConnection = window.RTCPeerConnection || window.webkitRTCPeerConnection;
@@ -60,7 +60,7 @@ win.on('loaded', function() {
 function _socket() {
     const io = require('socket.io-client');
     const url = 'http://127.0.0.1:3001';
-    console.log('socket url:', url);
+    console.log(TAG, 'socket url:', url);
 
     socket = io(url);
 
@@ -77,17 +77,17 @@ function _socket() {
 
         if (msg.type === 'offer') {
             //
-            console.log('Received offer:', msg.peerDescription);
+            console.log(TAG, 'Received offer:', msg.peerDescription);
 
         } else if (msg.type === 'answer') {
 
-            console.log('Received answer:', msg.peerDescription);
+            console.log(TAG, 'Received answer:', msg.peerDescription);
             var remoteDescription = msg.peerDescription;
             pc.setRemoteDescription(new RTCSessionDescription(remoteDescription));
 
         } else if (msg.type === 'candidate') {
 
-            //console.log('Received ICE candidate:', JSON.stringify(msg.candidate));
+            //console.log(TAG, 'Received ICE candidate:', JSON.stringify(msg.candidate));
             var candidate = new RTCIceCandidate(msg.candidate);
             pc.addIceCandidate(candidate);
         }
@@ -97,7 +97,7 @@ function _socket() {
 function _start() {
     nw.Screen.chooseDesktopMedia(['window','screen'],
         function(sourceId) {
-            console.log('sourceId:', sourceId);
+            console.log(TAG, 'sourceId:', sourceId);
 
             navigator.webkitGetUserMedia({
                 audio: false,
@@ -111,26 +111,26 @@ function _start() {
                     optional: []
                 }
             }, function(stream) {
-                console.log('stream:', stream);
+                console.log(TAG, 'stream:', stream);
 
                 localStream = stream;
 
                 var sourceUrl = URL.createObjectURL(stream);
-                console.log('local sourceUrl:', sourceUrl);
+                console.log(TAG, 'local sourceUrl:', sourceUrl);
 
                 document.getElementById('local_video').src = sourceUrl;
 
-                btnStart.disabled = true;
                 btnShare.disabled = false;
 
             }, function(err) {
-                console.error('err:', err);
+                console.error(TAG, 'err:', err);
             });
         }
     );
 }
 
 function _share() {
+    btnStart.disabled = true;
     btnShare.disabled = true;
     btnStop.disabled = false;
 
@@ -138,7 +138,7 @@ function _share() {
         iceServers: []
     });
 
-    console.log('[pc]:', pc);
+    console.log(TAG, '[pc]:', pc);
 
     pc.onicecandidate = function(event) {
         if (event.candidate) {
@@ -150,7 +150,7 @@ function _share() {
     };
 
     pc.oniceconnectionstatechange = function(event) {
-        console.log('oniceconnectionstatechange:', pc.iceConnectionState);
+        console.log(TAG, 'oniceconnectionstatechange:', pc.iceConnectionState);
     };
 
     pc.addStream(localStream);
@@ -158,7 +158,7 @@ function _share() {
 
     pc.createOffer(function(desc) {
 
-        console.log('Create Offer success');
+        console.log(TAG, 'Create Offer success');
 
         pc.setLocalDescription(desc);
 
@@ -168,7 +168,7 @@ function _share() {
         });
 
     }, function() {
-        console.log('Create Offer failed');
+        console.log(TAG, 'Create Offer failed');
     }, offer_opts);
 }
 
@@ -176,6 +176,7 @@ function _stop() {
     pc.close();
     pc = null;
 
+    btnStart.disabled = false;
     btnShare.disabled = false;
     btnStop.disabled = true;
 }

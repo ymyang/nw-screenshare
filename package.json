@@ -11,8 +11,9 @@
     "url": "git+https://github.com/ymyang/nw-screenshare.git"
   },
   "keywords": [
-    "mw",
-    "screenshare"
+    "nw",
+    "screen share",
+    "desktop share"
   ],
   "author": "ymyang",
   "license": "ISC",

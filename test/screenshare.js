@@ -62,12 +62,13 @@ function _start() {
 
                 localStream = stream;
 
+                pc1 && pc1.addStream(localStream);
+
                 var sourceUrl = URL.createObjectURL(stream);
                 console.log('local sourceUrl:', sourceUrl);
 
                 document.getElementById('local_video').src = sourceUrl;
 
-                btnStart.disabled = true;
                 btnShare.disabled = false;
 
             }, function(err) {
@@ -78,6 +79,7 @@ function _start() {
 }
 
 function _share() {
+    btnStart.disabled = true;
     btnShare.disabled = true;
     btnStop.disabled = false;
 
@@ -156,6 +158,7 @@ function _stop() {
     pc1 = null;
     pc2 = null;
 
+    btnStart.disabled = false;
     btnShare.disabled = false;
     btnStop.disabled = true;
 }
