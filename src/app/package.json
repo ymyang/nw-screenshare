@@ -7,10 +7,5 @@
     "position": "center",
     "width": 960,
     "height": 640
-  },
-  "dependencies": {
-    "express": "^4.14.0",
-    "socket.io": "^1.4.8",
-    "socket.io-client": "^1.4.8"
   }
 }

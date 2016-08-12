@@ -14,28 +14,50 @@ const _isMac = os.type() === 'Darwin';
 
 const nwVersion = '0.14.7';
 
-const manifest = jetpack.read('./src/package.json', 'json');
+const manifest = jetpack.read('./src/app/package.json', 'json');
 
 gulp.task('clean', () => {
     //jetpack.dir('./build', { empty: true });
     jetpack.remove('./build')
 });
 
-gulp.task('webpack', () => {
-    const config = require('./webpack.config.js');
+gulp.task('webpack-public', () => {
+    const config = require('./webpack.public.js');
     webpack(config, (err, stats) => {
         if (err) {
-            console.error('webpack', err);
+            console.error('webpack public', err);
             return;
         }
-        console.log('webpack ok');
+        console.log('webpack public ok');
     });
 });
 
-gulp.task('build', ['webpack'], () => {
-    jetpack.copy('./src', './build', {
+gulp.task('webpack-app', () => {
+    const config = require('./webpack.app.js');
+    webpack(config, (err, stats) => {
+        if (err) {
+            console.error('webpack app', err);
+            return;
+        }
+        console.log('webpack app ok');
+    });
+});
+
+gulp.task('build', ['webpack-public', 'webpack-app'], () => {
+    const manifest = jetpack.read('./package.json', 'json');
+    const dependencies = manifest.dependencies;
+    const matching = [];
+    for (let p in dependencies) {
+        matching.push(p + '/**');
+    }
+
+    jetpack.copy('./node_modules', './build/node_modules', {
         overwrite: true,
-        matching: ['package.json', 'main.html', 'main.js', 'socket-server.js', 'node_modules/**']
+        matching: matching
+    });
+
+    jetpack.copy('./src/app/package.json', './build/package.json', {
+        overwrite: true
     });
 });
 
