@@ -18,10 +18,10 @@ const manifest = jetpack.read('./src/app/package.json', 'json');
 
 gulp.task('clean', () => {
     //jetpack.dir('./build', { empty: true });
-    jetpack.remove('./build')
+    jetpack.remove('./build');
 });
 
-gulp.task('webpack-public', () => {
+gulp.task('webpack-public', ()=>{
     const config = require('./webpack.public.js');
     webpack(config, (err, stats) => {
         if (err) {
